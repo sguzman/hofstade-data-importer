@@ -66,12 +66,21 @@ def json_to_list_obs(js: json) -> List[Country]:
     return obs
 
 
+def insert_sql(data: List[Country]) -> None:
+    sql: str = 'INSERT INTO postgres.public.hofstede (country, power, individual, masculinity, uncertainty, longterm, indulgence) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+
+    cursor = conn.cursor()
+    for d in data:
+        cursor.execute(sql, d.data())
+
+    conn.commit()
+    cursor.close()
+
+
 def main() -> None:
     json_obj: json = json.loads(get_json())
     obs: List[Country] = json_to_list_obs(json_obj)
-
-    for o in obs:
-        print(str(o))
+    insert_sql(obs)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ import atexit
 import json
 import psycopg2
 import requests
+from typing import List
 
 
 class Country:
@@ -16,6 +17,9 @@ class Country:
 
     def data(self):
         return [self.country, self.pd, self.i, self.m, self.ua, self.lto, self.ind]
+
+    def __str__(self):
+        return f'{self.country}({self.pd},{self.i},{self.m},{self.ua},{self.lto},{self.ind})'
 
 
 def con() -> psycopg2:
@@ -39,8 +43,35 @@ def get_json() -> str:
     return requests.get(url).text
 
 
+def num_or_0(text: str) -> int:
+    if text == '':
+        return 0
+    else:
+        return int(text)
+
+
+def json_to_list_obs(js: json) -> List[Country]:
+    obs: List[Country] = []
+    for j in js:
+        obj: Country = Country(j['slug'],
+                               int(j['pdi']),
+                               int(j['idv']),
+                               int(j['mas']),
+                               int(j['uai']),
+                               num_or_0(j['lto']),
+                               num_or_0(j['ind'])
+                               )
+        obs.append(obj)
+
+    return obs
+
+
 def main() -> None:
-    print(get_json())
+    json_obj: json = json.loads(get_json())
+    obs: List[Country] = json_to_list_obs(json_obj)
+
+    for o in obs:
+        print(str(o))
 
 
 if __name__ == '__main__':

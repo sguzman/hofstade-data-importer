@@ -1,5 +1,21 @@
 import atexit
+import json
 import psycopg2
+import requests
+
+
+class Country:
+    def __init__(self, country: str, pd: int, i: int, m: int, ua: int, lto: int, ind: int):
+        self.country: str = country
+        self.pd: int = pd
+        self.i: int = i
+        self.m: int = m
+        self.ua: int = ua
+        self.lto: int = lto
+        self.ind: int = ind
+
+    def data(self):
+        return [self.country, self.pd, self.i, self.m, self.ua, self.lto, self.ind]
 
 
 def con() -> psycopg2:
@@ -15,9 +31,16 @@ def con() -> psycopg2:
     return conn
 
 
+conn: psycopg2 = con()
+
+
+def get_json() -> str:
+    url: str = 'https://www.hofstede-insights.com/wp-json/v1/country'
+    return requests.get(url).text
+
+
 def main() -> None:
-    con()
-    print('hello')
+    print(get_json())
 
 
 if __name__ == '__main__':
